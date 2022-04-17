@@ -10,6 +10,7 @@
 本次阅读的spring版本为`5.3.10`，查看`gradle->wrapper->gradle-wrapper.properties`，官方指定gradle版本为`gradle-6.8.3`，因为gradle每次编译都会从官网下载指定版本，可下载到本地之后，修改`distributionUrl`为本地路径，这样就不会每次都下载了
 
 下载gradle后解压到本地
+
 ![image.png](img/image.png)
 
 
@@ -17,12 +18,15 @@
 设置环境变量:
 `GRADLE_HOME`=解压目录
 path新增`%GRADLE_HOME%\bin\`
+
 ![image-1](img/image_1.png)
+
 ![image_2](img/image_2.png)
 
 
 
 控制台查看：`gradle -v`
+
 ![image_3](img/image_3.png)
 
 到此gradle安装成功
@@ -30,11 +34,13 @@ path新增`%GRADLE_HOME%\bin\`
 ## 3、IDEA配置Gradle
 如图，配置Gradle用户主目录（相当于本地Maven仓库）,gradle编译项目所依赖的jar都会下载后放入这个目录中，使用的gradle选择刚配置好的文件夹。JDK至少是JDK8，此处选择默认8。
 构建并运行选择IDEA，如果选择Gradle每次都会跑一堆Task
+
 ![image_4](img/image_4.png)
 
 
 
 `gradle-wrapper.properties` 中修改`distributionUrl`为本地路径，这样就不会每次都下载了
+
 ![image_5](img/image_5.png)
 
 ```groovy
@@ -53,6 +59,7 @@ buildscript {
 }
 ```
 如图：
+
 ![image_6](img/image_6.png)
 
 
@@ -86,6 +93,7 @@ repositories {
 
 构建成功之后,找到 `ApplicationContext`类
 打开后,按下Ctrl+Alt+U键,如果出现下图所示类图界面说明构建成功了!(构建过程就是找依赖对象的过程)
+
 ![image_8](img/image_8.png)
 
 此时可以查看Spring的源码了,但是我们需要在源码的基础上面进行修改,开发,调试,添加注释等等
@@ -98,31 +106,28 @@ repositories {
 1. 在构建完成源码之后,就搭建好了阅读源码的环境了,此时我们还需要将源码编译打包。
    在编译之前需要进行一些配置修改,可以查看`import-into-idea.md`文档。
    如图：
+
    ![image_9](img/image_9.png)
 
 
 
-2. 文档要求先编译 `spring-oxm` 下的 `compileTestJava` ,点击右上角gradle打开编译视图,找到spring-oxm模块,然后在other下找到compileTestjava,双击即可!
-   ![image_10](img/image_10.png)
+2. 文档要求先编译 `spring-oxm` 下的 `compileTestJava` ,点击右上角gradle打开编译视图,找到spring-oxm模块,然后在other下找到compileTestJava,双击即可!
 
+    ![image_10](img/image_10.png)
 
+    编译成功：由于源码被编辑过，会有部分注释报错，用git clone的没问题
 
-​	编译成功：由于源码被编辑过，会有部分注释报错，用git clone的没问题
-​	![image_11](img/image_11.png)
-
+    ![image_11](img/image_11.png)
 
 
 3. 保险起见再编译下spring-core模块,因为之后的spring-context依赖于core,方法同上。
-   ![image_12](img/image_12.png)
-
-
+   
+    ![image_12](img/image_12.png)
 
 4. 都编译完成且成功之后,开始编译整个工程(这个过程非常耗时间,可能10-20分钟!) ，如下图
-   打开顶层spring->build->build
-   ![image_13](img/image_13.png)
-   经过一段时间编译,build成功!(每个人电脑的性能不一样,所需时间也不一样)
-
-
+   打开顶层spring->build->build, 经过一段时间编译,build成功!(每个人电脑的性能不一样,所需时间也不一样)
+   
+    ![image_13](img/image_13.png)
 
 ##  5、源码测试
 
@@ -142,6 +147,7 @@ repositories {
 3. Finish,idea会自动帮助我们构建my-test模块
 
 打开全局配置文件:`settings.gradle`文件,拉到最下面,我们看到系统自动加上了my-test模块
+
 ![image-20220417114707099](img/image-20220417114707099.png)
 
 
@@ -160,6 +166,7 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.7.0'
 }
 ```
+
 ![image_16](img/image_16.png)
 
 
@@ -265,6 +272,7 @@ public class Test {
 ```
 
 运行, console输出
+
 ![image_18](img/image_18.png)
 
 
@@ -290,6 +298,7 @@ Error:(354, 51) java: 找不到符号
 点击【File】 ->【 Project Structure】 -> 【Libraries】 -> 【+】 -> 【Java】,然后选择spring-
 framework/spring-core/kotlin-coroutines/build/libs/kotlin-coroutines-5.3.0-SNAPSHOT.jar,在弹出
 的对话框中选择spring-core.main,再重新build项目即可。
+
 ![image_20](img/image_20.png)
 
 ![image_21](img/image_21.png)
