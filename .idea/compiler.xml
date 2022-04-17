@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel>
+      <module name="spring.spring-tuling-boot" target="1.8" />
+      <module name="spring.spring-tuling-boot.jmh" target="1.8" />
+      <module name="spring.spring-tuling-boot.main" target="1.8" />
+      <module name="spring.spring-tuling-boot.test" target="1.8" />
+      <module name="spring.spring-tuling-boot.testFixtures" target="1.8" />
+      <module name="spring.spring-tuling-webmvc" target="1.8" />
+      <module name="spring.spring-tuling-webmvc.jmh" target="1.8" />
+      <module name="spring.spring-tuling-webmvc.main" target="1.8" />
+      <module name="spring.spring-tuling-webmvc.test" target="1.8" />
+      <module name="spring.spring-tuling-webmvc.testFixtures" target="1.8" />
+      <module name="spring.tuling" target="1.8" />
+      <module name="spring.tuling-boot" target="1.8" />
+      <module name="spring.tuling-boot.main" target="1.8" />
+      <module name="spring.tuling-boot.test" target="1.8" />
+      <module name="spring.tuling-boot.testFixtures" target="1.8" />
+      <module name="spring.tuling-vip-demo" target="1.8" />
+      <module name="spring.tuling-vip-demo.main" target="1.8" />
+      <module name="spring.tuling-vip-demo.test" target="1.8" />
+      <module name="spring.tuling-vip-demo.testFixtures" target="1.8" />
+      <module name="spring.tuling-web" target="1.8" />
+      <module name="spring.tuling-web.main" target="1.8" />
+      <module name="spring.tuling-web.test" target="1.8" />
+      <module name="spring.tuling-web.testFixtures" target="1.8" />
+      <module name="spring.tuling.main" target="1.8" />
+      <module name="spring.tuling.test" target="1.8" />
+      <module name="spring.tuling.testFixtures" target="1.8" />
+    </bytecodeTargetLevel>
+  </component>
+</project>
