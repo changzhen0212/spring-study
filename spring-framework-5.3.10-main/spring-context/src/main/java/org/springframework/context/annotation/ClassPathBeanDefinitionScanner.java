@@ -264,17 +264,21 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 	 * @param basePackages the packages to check for annotated classes
 	 * @return set of beans registered if any for tooling registration purposes (never {@code null})
 	 */
+	// !!! 扫描
 	protected Set<BeanDefinitionHolder> doScan(String... basePackages) {
 		Assert.notEmpty(basePackages, "At least one base package must be specified");
 		Set<BeanDefinitionHolder> beanDefinitions = new LinkedHashSet<>();
 		for (String basePackage : basePackages) {
-
+			// ! 扫描
 			Set<BeanDefinition> candidates = findCandidateComponents(basePackage);
 
+			// # 遍历
 			for (BeanDefinition candidate : candidates) {
+				// # 解析scope的元数据
 				ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(candidate);
+				// # set进scope信息 单例、原型
 				candidate.setScope(scopeMetadata.getScopeName());
-
+				// ! 生成beanName, 进入AnnotationBeanNameGenerator#generateBeanName实现
 				String beanName = this.beanNameGenerator.generateBeanName(candidate, this.registry);
 
 				if (candidate instanceof AbstractBeanDefinition) {

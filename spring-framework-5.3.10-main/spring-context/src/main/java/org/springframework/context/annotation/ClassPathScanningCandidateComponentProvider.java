@@ -316,6 +316,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 			return addCandidateComponentsFromIndex(this.componentsIndex, basePackage);
 		}
 		else {
+			// ! 扫描，通常进入这里
 			return scanCandidateComponents(basePackage);
 		}
 	}
@@ -416,13 +417,14 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 		}
 		return candidates;
 	}
-
+	// !!! 扫描
 	private Set<BeanDefinition> scanCandidateComponents(String basePackage) {
 		Set<BeanDefinition> candidates = new LinkedHashSet<>();
 		try {
-			// 获取basePackage下所有的文件资源
+			// # 获取basePackage下所有的文件资源
 			String packageSearchPath = ResourcePatternResolver.CLASSPATH_ALL_URL_PREFIX +
 					resolveBasePackage(basePackage) + '/' + this.resourcePattern;
+			// # 获取所有资源，class文件
 			Resource[] resources = getResourcePatternResolver().getResources(packageSearchPath);
 			boolean traceEnabled = logger.isTraceEnabled();
 			boolean debugEnabled = logger.isDebugEnabled();
@@ -432,9 +434,11 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 				}
 				if (resource.isReadable()) {
 					try {
+						// # 读取所有类的元数据 使用了asm技术
 						MetadataReader metadataReader = getMetadataReaderFactory().getMetadataReader(resource);
-						// excludeFilters、includeFilters判断
+						// # excludeFilters、includeFilters判断， 先判断排除，再判断加载
 						if (isCandidateComponent(metadataReader)) { // @Component-->includeFilters判断
+							// ! 构造beanDefinition
 							ScannedGenericBeanDefinition sbd = new ScannedGenericBeanDefinition(metadataReader);
 							sbd.setSource(resource);
 
@@ -442,6 +446,7 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 								if (debugEnabled) {
 									logger.debug("Identified candidate component class: " + resource);
 								}
+								// # 扫描得到的beanDefinition添加到Set ，返回
 								candidates.add(sbd);
 							}
 							else {
@@ -500,9 +505,10 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 			}
 		}
 
-		// 符合includeFilters的会进行条件匹配，通过了才是Bean，也就是先看有没有@Component，再看是否符合@Conditional
+		// # 符合includeFilters的会进行条件匹配，通过了才是Bean，也就是先看有没有@Component，再看是否符合@Conditional
 		for (TypeFilter tf : this.includeFilters) {
 			if (tf.match(metadataReader, getMetadataReaderFactory())) {
+				// * 是否被Condition修饰
 				return isConditionMatch(metadataReader);
 			}
 		}
@@ -533,6 +539,11 @@ public class ClassPathScanningCandidateComponentProvider implements EnvironmentC
 	 */
 	protected boolean isCandidateComponent(AnnotatedBeanDefinition beanDefinition) {
 		AnnotationMetadata metadata = beanDefinition.getMetadata();
+		/**
+		 metadata.isIndependent() - 不是独立的类(比如内部类)不能成为bean
+		 metadata.isConcrete() - 是否是接口、抽象类, 接口或者抽象类不能成为bean
+		 如果是抽象类，被LookUp注解修饰，可以成为bean
+		 */
 		return (metadata.isIndependent() && (metadata.isConcrete() ||
 				(metadata.isAbstract() && metadata.hasAnnotatedMethods(Lookup.class.getName()))));
 	}
