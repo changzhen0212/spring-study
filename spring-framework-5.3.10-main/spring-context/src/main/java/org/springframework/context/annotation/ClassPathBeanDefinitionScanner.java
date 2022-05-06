@@ -285,18 +285,18 @@ public class ClassPathBeanDefinitionScanner extends ClassPathScanningCandidateCo
 					postProcessBeanDefinition((AbstractBeanDefinition) candidate, beanName);
 				}
 				if (candidate instanceof AnnotatedBeanDefinition) {
-					// 解析@Lazy、@Primary、@DependsOn、@Role、@Description
+					// # 解析@Lazy、@Primary、@DependsOn、@Role、@Description
 					AnnotationConfigUtils.processCommonDefinitionAnnotations((AnnotatedBeanDefinition) candidate);
 				}
 
-				// 检查Spring容器中是否已经存在该beanName
+				// # 检查Spring容器中是否已经存在该beanName
 				if (checkCandidate(beanName, candidate)) {
 					BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(candidate, beanName);
 					definitionHolder =
 							AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 					beanDefinitions.add(definitionHolder);
 
-					// 注册
+					// ! 不存在，则进行注册
 					registerBeanDefinition(definitionHolder, this.registry);
 				}
 			}

@@ -214,6 +214,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 	 * with, if necessary
 	 * @return the registered singleton object
 	 */
+	// ! 从单例池获取, singletonFactory是传进来的lambda表达式
 	public Object getSingleton(String beanName, ObjectFactory<?> singletonFactory) {
 		Assert.notNull(beanName, "Bean name must not be null");
 		synchronized (this.singletonObjects) {
@@ -234,6 +235,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					this.suppressedExceptions = new LinkedHashSet<>();
 				}
 				try {
+					// # 执行lambda表达式
 					singletonObject = singletonFactory.getObject();
 					newSingleton = true;
 				}
@@ -260,7 +262,7 @@ public class DefaultSingletonBeanRegistry extends SimpleAliasRegistry implements
 					afterSingletonCreation(beanName);
 				}
 
-				// 添加到单例池
+				// ! 添加到单例池
 				if (newSingleton) {
 					addSingleton(beanName, singletonObject);
 				}

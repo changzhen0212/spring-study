@@ -11,7 +11,7 @@ public class Test {
 
 	public static void main(String[] args) {
 		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
-		User user = (User) context.getBean("user");
+		User user = (User) context.getBean("user", new User());
 		System.out.println(user);
 	}
 

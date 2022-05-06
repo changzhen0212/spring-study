@@ -937,14 +937,16 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 
 		// Trigger initialization of all non-lazy singleton beans...
 		for (String beanName : beanNames) {
-			// 获取合并后的BeanDefinition
+			// ! 获取合并后的BeanDefinition
 			RootBeanDefinition bd = getMergedLocalBeanDefinition(beanName);
 
+			// # 判断不是抽象的beanDefinition(不是抽象类概念，抽象类不会生成beanDefinition，抽象的beanDefinition通常在xml里配置 abstract=true)，单例，非懒加载，才会进入if代码块
 			if (!bd.isAbstract() && bd.isSingleton() && !bd.isLazyInit()) {
 				if (isFactoryBean(beanName)) {
-					// 获取FactoryBean对象
+					// # 创建FactoryBean对象， 放入单例池
 					Object bean = getBean(FACTORY_BEAN_PREFIX + beanName);
 					if (bean instanceof FactoryBean) {
+						// # 先强制转换
 						FactoryBean<?> factory = (FactoryBean<?>) bean;
 						boolean isEagerInit;
 						if (System.getSecurityManager() != null && factory instanceof SmartFactoryBean) {
@@ -953,26 +955,30 @@ public class DefaultListableBeanFactory extends AbstractAutowireCapableBeanFacto
 									getAccessControlContext());
 						}
 						else {
+							// # 如果是实现了SmartFactoryBean，而且 isEagerInit 属性为true
+							// # SmartFactoryBean 属于对 Factory的增强
 							isEagerInit = (factory instanceof SmartFactoryBean &&
 									((SmartFactoryBean<?>) factory).isEagerInit());
 						}
 						if (isEagerInit) {
-							// 创建真正的Bean对象(getObject()返回的对象)
+							// ! 创建真正的Bean对象(getObject()返回的对象)
 							getBean(beanName);
 						}
 					}
 				}
 				else {
-					// 创建Bean对象
+					// ! 创建Bean对象
 					getBean(beanName);
 				}
 			}
 		}
 
-		// 所有的非懒加载单例Bean都创建完了后
+		// # 所有的非懒加载单例Bean都创建完了后
 		// Trigger post-initialization callback for all applicable beans...
 		for (String beanName : beanNames) {
+			// ! 从单例池拿beanName对应的单例bean对象
 			Object singletonInstance = getSingleton(beanName);
+			// # 如果单例对象实现了 SmartInitializingSingleton 接口， 执行smartSingleton.afterSingletonsInstantiated();方法， 扩展点
 			if (singletonInstance instanceof SmartInitializingSingleton) {
 				StartupStep smartInitialize = this.getApplicationStartup().start("spring.beans.smart-initialize")
 						.tag("beanName", beanName);
