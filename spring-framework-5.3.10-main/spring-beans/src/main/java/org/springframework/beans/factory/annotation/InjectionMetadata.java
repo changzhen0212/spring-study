@@ -116,8 +116,9 @@ public class InjectionMetadata {
 		Collection<InjectedElement> elementsToIterate =
 				(checkedElements != null ? checkedElements : this.injectedElements);
 		if (!elementsToIterate.isEmpty()) {
-			// 遍历每个注入点进行依赖注入
+			// ! 遍历每个注入点进行依赖注入
 			for (InjectedElement element : elementsToIterate) {
+				// ! 从这里直接进入找到的并不是处理@Autowired的方法,而是@Resource. 真正处理@Autowired的方法是在进入后的子类执行
 				element.inject(target, beanName, pvs);
 			}
 		}
@@ -221,12 +222,15 @@ public class InjectionMetadata {
 		/**
 		 * Either this or {@link #getResourceToInject} needs to be overridden.
 		 */
+		// # 这里的注入方法 inject 并不是处理@Autowired的方法, 而是处理@Resource的方法
+		// # 真正处理@Autowired的方法是这个方法的子类 AutowiredFieldElement-属性上注解、AutowiredMethodElement-方法上注解 实现的方法
 		protected void inject(Object target, @Nullable String requestingBeanName, @Nullable PropertyValues pvs)
 				throws Throwable {
 
 			if (this.isField) {
 				Field field = (Field) this.member;
 				ReflectionUtils.makeAccessible(field);
+				// ! 进入@Resource实现
 				field.set(target, getResourceToInject(target, requestingBeanName));
 			}
 			else {

@@ -342,11 +342,11 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		// Create proxy if we have advice.
-		// 判断当前bean是否存在匹配的advice，如果存在则要生成一个代理对象
-		// 此处根据类以及类中的方法去匹配到Interceptor（也就是Advice），然后生成代理对象，代理对象在执行的时候，还会根据当前执行的方法去匹配
+		// # 判断当前bean是否存在匹配的advice，如果存在则要生成一个代理对象
+		// # 此处根据类以及类中的方法去匹配到Interceptor（也就是Advice），然后生成代理对象，代理对象在执行的时候，还会根据当前执行的方法去匹配
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
-			// advisedBeans记录了某个Bean已经进行过AOP了
+			// # advisedBeans记录了某个Bean已经进行过AOP了
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
 			Object proxy = createProxy(
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));

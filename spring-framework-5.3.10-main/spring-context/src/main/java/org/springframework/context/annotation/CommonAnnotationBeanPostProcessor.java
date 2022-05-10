@@ -289,9 +289,11 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 	}
 
 
+	// ! beanDefinition后置处理，处理寻找注入点
 	@Override
 	public void postProcessMergedBeanDefinition(RootBeanDefinition beanDefinition, Class<?> beanType, String beanName) {
 		super.postProcessMergedBeanDefinition(beanDefinition, beanType, beanName);
+		// ! 寻找@Resource注入点
 		InjectionMetadata metadata = findResourceMetadata(beanName, beanType, null);
 		metadata.checkConfigMembers(beanDefinition);
 	}
@@ -311,10 +313,13 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 		return true;
 	}
 
+	// ! 依赖注入
 	@Override
 	public PropertyValues postProcessProperties(PropertyValues pvs, Object bean, String beanName) {
+		// # 经过了寻找注入点就从缓存中取
 		InjectionMetadata metadata = findResourceMetadata(beanName, bean.getClass(), pvs);
 		try {
+			// ! 依赖注入
 			metadata.inject(bean, beanName, pvs);
 		}
 		catch (Throwable ex) {
@@ -344,6 +349,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 					if (metadata != null) {
 						metadata.clear(pvs);
 					}
+					// ! 构建Resource元数据
 					metadata = buildResourceMetadata(clazz);
 					this.injectionMetadataCache.put(cacheKey, metadata);
 				}
@@ -376,11 +382,12 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 					}
 					currElements.add(new EjbRefElement(field, field, null));
 				}
-				else if (field.isAnnotationPresent(Resource.class)) {
+				else if (field.isAnnotationPresent(Resource.class)) { // # @Resource 注解
 					if (Modifier.isStatic(field.getModifiers())) {
 						throw new IllegalStateException("@Resource annotation is not supported on static fields");
 					}
 					if (!this.ignoredResourceTypes.contains(field.getType().getName())) {
+						// ! @Resource元数据 ResourceElement
 						currElements.add(new ResourceElement(field, field, null));
 					}
 				}
@@ -494,7 +501,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 			throw new NoSuchBeanDefinitionException(element.lookupType,
 					"No resource factory configured - specify the 'resourceFactory' property");
 		}
-		// 根据LookupElement从BeanFactory找到适合的bean对象
+		// ! 根据LookupElement从BeanFactory找到适合的bean对象
 		return autowireResource(this.resourceFactory, element, requestingBeanName);
 	}
 
@@ -518,9 +525,10 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 			AutowireCapableBeanFactory beanFactory = (AutowireCapableBeanFactory) factory;
 			DependencyDescriptor descriptor = element.getDependencyDescriptor();
 
-			// 假设@Resource中没有指定name，并且field的name或setXxx()的xxx不存在对应的bean，那么则根据field类型或方法参数类型从BeanFactory去找
+			// # 假设@Resource中没有指定name，并且field的name或setXxx()的xxx不存在对应的bean，那么则根据field类型或方法参数类型从BeanFactory去找
 			if (this.fallbackToDefaultTypeMatch && element.isDefaultName && !factory.containsBean(name)) {
 				autowiredBeanNames = new LinkedHashSet<>();
+				// ! 注解字段和注解方法都会进入到这里
 				resource = beanFactory.resolveDependency(descriptor, requestingBeanName, autowiredBeanNames, null);
 				if (resource == null) {
 					throw new NoSuchBeanDefinitionException(element.getLookupType(), "No resolvable resource object");
@@ -623,7 +631,7 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 			String resourceName = resource.name();
 			Class<?> resourceType = resource.type();
 
-			// 使用@Resource时没有指定具体的name，那么则用field的name，或setXxx()中的xxx
+			// # 使用@Resource时没有指定具体的name，那么则用field的name，或setXxx()中的xxx
 			this.isDefaultName = !StringUtils.hasLength(resourceName);
 			if (this.isDefaultName) {
 				resourceName = this.member.getName();
@@ -631,14 +639,14 @@ public class CommonAnnotationBeanPostProcessor extends InitDestroyAnnotationBean
 					resourceName = Introspector.decapitalize(resourceName.substring(3));
 				}
 			}
-			// 使用@Resource时指定了具体的name，进行占位符填充
+			// # 使用@Resource时指定了具体的name，进行占位符填充
 			else if (embeddedValueResolver != null) {
 				resourceName = embeddedValueResolver.resolveStringValue(resourceName);
 			}
 
-			// @Resource除开可以指定bean，还可以指定type，type默认为Object
+			// # @Resource除开可以指定bean，还可以指定type，type默认为Object
 			if (Object.class != resourceType) {
-				// 如果指定了type，则验证一下和field的类型或set方法的第一个参数类型，是否和所指定的resourceType匹配
+				// # 如果指定了type，则验证一下和field的类型或set方法的第一个参数类型，是否和所指定的resourceType匹配
 				checkResourceType(resourceType);
 			}
 			else {
