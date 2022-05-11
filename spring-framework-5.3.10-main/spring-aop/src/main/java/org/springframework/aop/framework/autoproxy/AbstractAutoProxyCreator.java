@@ -290,6 +290,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (bean != null) {
 			Object cacheKey = getCacheKey(bean.getClass(), beanName);
 			if (this.earlyProxyReferences.remove(cacheKey) != bean) {
+				// ! 创建代理对象
 				return wrapIfNecessary(bean, beanName, cacheKey);
 			}
 		}
@@ -348,6 +349,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (specificInterceptors != DO_NOT_PROXY) {
 			// # advisedBeans记录了某个Bean已经进行过AOP了
 			this.advisedBeans.put(cacheKey, Boolean.TRUE);
+			// ! 创建代理对象
 			Object proxy = createProxy(
 					bean.getClass(), beanName, specificInterceptors, new SingletonTargetSource(bean));
 			this.proxyTypes.put(cacheKey, proxy.getClass());
@@ -470,7 +472,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		}
 
 		Advisor[] advisors = buildAdvisors(beanName, specificInterceptors);
-		// 在这一步会去判断advisors中是否存在IntroductionAdvisor，如果存在则会把对应的interface添加到proxyFactory中去
+		// # 在这一步会去判断advisors中是否存在IntroductionAdvisor，如果存在则会把对应的interface添加到proxyFactory中去
 		proxyFactory.addAdvisors(advisors);
 		proxyFactory.setTargetSource(targetSource);
 		customizeProxyFactory(proxyFactory);
@@ -485,6 +487,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		if (classLoader instanceof SmartClassLoader && classLoader != beanClass.getClassLoader()) {
 			classLoader = ((SmartClassLoader) classLoader).getOriginalClassLoader();
 		}
+		// ! 选择代理方式
 		return proxyFactory.getProxy(classLoader);
 	}
 

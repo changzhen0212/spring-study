@@ -433,7 +433,7 @@ class ConstructorResolver {
 		Class<?> factoryClass;
 		boolean isStatic;
 
-		// 注意，这里拿到的是factoryBeanName，而不是factoryMethodName，比如AppConfig对象
+		// # 注意，这里拿到的是factoryBeanName，而不是factoryMethodName，比如AppConfig对象
 		String factoryBeanName = mbd.getFactoryBeanName();
 		if (factoryBeanName != null) {
 			if (factoryBeanName.equals(beanName)) {
@@ -442,7 +442,7 @@ class ConstructorResolver {
 			}
 			factoryBean = this.beanFactory.getBean(factoryBeanName);
 
-			// 该单例已经创建好了？
+			// # 该单例已经创建好了？
 			if (mbd.isSingleton() && this.beanFactory.containsSingleton(beanName)) {
 				throw new ImplicitlyAppearedSingletonException();
 			}
@@ -452,7 +452,7 @@ class ConstructorResolver {
 		}
 		else {
 			// It's a static factory method on the bean class.
-			// static的@Bean方法
+			// # static的@Bean方法
 			if (!mbd.hasBeanClass()) {
 				throw new BeanDefinitionStoreException(mbd.getResourceDescription(), beanName,
 						"bean definition declares neither a bean class nor a factory-bean reference");
@@ -501,7 +501,7 @@ class ConstructorResolver {
 				}
 			}
 
-			// 找到对应的@Bean方法，由于可能参数重载，所以有可能会有多个
+			// # 找到对应的@Bean方法，由于可能参数重载，所以有可能会有多个
 			if (candidates == null) {
 				candidates = new ArrayList<>();
 				Method[] rawCandidates = getCandidateMethods(factoryClass, mbd);
@@ -572,7 +572,7 @@ class ConstructorResolver {
 						// Resolved constructor arguments: type conversion and/or autowiring necessary.
 						try {
 
-							// 根据参数类型和参数名找Bean
+							// # 根据参数类型和参数名找Bean
 							String[] paramNames = null;
 							ParameterNameDiscoverer pnd = this.beanFactory.getParameterNameDiscoverer();
 							if (pnd != null) {
@@ -674,7 +674,7 @@ class ConstructorResolver {
 				argsHolderToUse.storeCache(mbd, factoryMethodToUse);
 			}
 		}
-
+		// ! 实例化bean instantiate
 		bw.setBeanInstance(instantiate(beanName, mbd, factoryBean, factoryMethodToUse, argsToUse));
 		return bw;
 	}
@@ -690,6 +690,7 @@ class ConstructorResolver {
 						this.beanFactory.getAccessControlContext());
 			}
 			else {
+				// ! 实例化bean instantiate
 				return this.beanFactory.getInstantiationStrategy().instantiate(
 						mbd, beanName, this.beanFactory, factoryBean, factoryMethod, args);
 			}

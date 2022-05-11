@@ -551,54 +551,54 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 			prepareRefresh();
 
 			// Tell the subclass to refresh the internal bean factory.
-			// 这里会判断能否刷新，并且返回一个BeanFactory, 刷新不代表完全情况，主要是先执行Bean的销毁，然后重新生成一个BeanFactory，再在接下来的步骤中重新去扫描等等
+			// # 这里会判断能否刷新，并且返回一个BeanFactory, 刷新不代表完全情况，主要是先执行Bean的销毁，然后重新生成一个BeanFactory，再在接下来的步骤中重新去扫描等等
 			ConfigurableListableBeanFactory beanFactory = obtainFreshBeanFactory();
 
 			// Prepare the bean factory for use in this context.
-			// 准备BeanFactory
-			// 1. 设置BeanFactory的类加载器、SpringEL表达式解析器、类型转化注册器
-			// 2. 添加三个BeanPostProcessor，注意是具体的BeanPostProcessor实例对象
-			// 3. 记录ignoreDependencyInterface
-			// 4. 记录ResolvableDependency
-			// 5. 添加三个单例Bean
+			// # 准备BeanFactory
+			// # 1. 设置BeanFactory的类加载器、SpringEL表达式解析器、类型转化注册器
+			// # 2. 添加三个BeanPostProcessor，注意是具体的BeanPostProcessor实例对象
+			// # 3. 记录ignoreDependencyInterface
+			// # 4. 记录ResolvableDependency
+			// # 5. 添加三个单例Bean
 			prepareBeanFactory(beanFactory);
 
 			try {
 				// Allows post-processing of the bean factory in context subclasses.
-				// 子类来设置一下BeanFactory
+				// # 子类来设置一下BeanFactory
 				postProcessBeanFactory(beanFactory);
 
 				StartupStep beanPostProcess = this.applicationStartup.start("spring.context.beans.post-process");
 
 				// Invoke factory processors registered as beans in the context.
-				// BeanFactory准备好了之后，执行BeanFactoryPostProcessor，开始对BeanFactory进行处理
-				// 默认情况下:
-				// 此时beanFactory的beanDefinitionMap中有6个BeanDefinition，5个基础BeanDefinition+AppConfig的BeanDefinition
-				// 而这6个中只有一个BeanFactoryPostProcessor：ConfigurationClassPostProcessor
-				// 这里会执行ConfigurationClassPostProcessor进行@Component的扫描，扫描得到BeanDefinition，并注册到beanFactory中
-				// 注意：扫描的过程中可能又会扫描出其他的BeanFactoryPostProcessor，那么这些BeanFactoryPostProcessor也得在这一步执行
+				// # BeanFactory准备好了之后，执行BeanFactoryPostProcessor，开始对BeanFactory进行处理
+				// # 默认情况下:
+				// # 此时beanFactory的beanDefinitionMap中有6个BeanDefinition，5个基础BeanDefinition+AppConfig的BeanDefinition
+				// # 而这6个中只有一个BeanFactoryPostProcessor：ConfigurationClassPostProcessor
+				// # 这里会执行ConfigurationClassPostProcessor进行@Component的扫描，扫描得到BeanDefinition，并注册到beanFactory中
+				// # 注意：扫描的过程中可能又会扫描出其他的BeanFactoryPostProcessor，那么这些BeanFactoryPostProcessor也得在这一步执行
 				invokeBeanFactoryPostProcessors(beanFactory);  // scanner.scan()
 
 				// Register bean processors that intercept bean creation.
-				// 将扫描到的BeanPostProcessors实例化并排序，并添加到BeanFactory的beanPostProcessors属性中去
+				// # 将扫描到的BeanPostProcessors实例化并排序，并添加到BeanFactory的beanPostProcessors属性中去
 				registerBeanPostProcessors(beanFactory);
 
 				beanPostProcess.end();
 
 				// Initialize message source for this context.
-				// 设置ApplicationContext的MessageSource，要么是用户设置的，要么是DelegatingMessageSource
+				// # 设置ApplicationContext的MessageSource，要么是用户设置的，要么是DelegatingMessageSource
 				initMessageSource();
 
 				// Initialize event multicaster for this context.
-				// 设置ApplicationContext的applicationEventMulticaster，么是用户设置的，要么是SimpleApplicationEventMulticaster
+				// # 设置ApplicationContext的applicationEventMulticaster，么是用户设置的，要么是SimpleApplicationEventMulticaster
 				initApplicationEventMulticaster();
 
 				// Initialize other special beans in specific context subclasses.
-				// 给子类的模板方法
+				// # 给子类的模板方法
 				onRefresh();
 
 				// Check for listener beans and register them.
-				// 把定义的ApplicationListener的Bean对象，设置到ApplicationContext中去，并执行在此之前所发布的事件
+				// # 把定义的ApplicationListener的Bean对象，设置到ApplicationContext中去，并执行在此之前所发布的事件
 				registerListeners();
 
 				// Instantiate all remaining (non-lazy-init) singletons.
@@ -928,8 +928,8 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 	 */
 	protected void finishBeanFactoryInitialization(ConfigurableListableBeanFactory beanFactory) {
 		// Initialize conversion service for this context.
-		// 如果BeanFactory中存在名字叫conversionService的Bean,则设置为BeanFactory的conversionService属性
-		// ConversionService是用来进行类型转化的
+		// # 如果BeanFactory中存在名字叫conversionService的Bean,则设置为BeanFactory的conversionService属性
+		// # ConversionService是用来进行类型转化的
 		if (beanFactory.containsBean(CONVERSION_SERVICE_BEAN_NAME) &&
 				beanFactory.isTypeMatch(CONVERSION_SERVICE_BEAN_NAME, ConversionService.class)) {
 			beanFactory.setConversionService(
@@ -939,7 +939,7 @@ public abstract class AbstractApplicationContext extends DefaultResourceLoader
 		// Register a default embedded value resolver if no BeanFactoryPostProcessor
 		// (such as a PropertySourcesPlaceholderConfigurer bean) registered any before:
 		// at this point, primarily for resolution in annotation attribute values.
-		// 设置默认的占位符解析器  ${xxx}  ---key
+		// # 设置默认的占位符解析器  ${xxx}  ---key
 		if (!beanFactory.hasEmbeddedValueResolver()) {
 			beanFactory.addEmbeddedValueResolver(strVal -> getEnvironment().resolvePlaceholders(strVal));
 		}
