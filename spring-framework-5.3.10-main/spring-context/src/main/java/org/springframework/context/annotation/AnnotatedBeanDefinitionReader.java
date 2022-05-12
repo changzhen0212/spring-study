@@ -84,9 +84,9 @@ public class AnnotatedBeanDefinitionReader {
 		Assert.notNull(registry, "BeanDefinitionRegistry must not be null");
 		Assert.notNull(environment, "Environment must not be null");
 		this.registry = registry;
-		// 用来解析@Conditional注解的
+		// # 用来解析@Conditional注解的
 		this.conditionEvaluator = new ConditionEvaluator(registry, environment, null);
-		// 注册
+		// ! 注册注解配置处理器
 		AnnotationConfigUtils.registerAnnotationConfigProcessors(this.registry);
 	}
 
@@ -258,7 +258,7 @@ public class AnnotatedBeanDefinitionReader {
 		}
 
 		abd.setInstanceSupplier(supplier);
-		// 解析@Scope注解的结果为ScopeMetadata
+		// # 解析@Scope注解的结果为ScopeMetadata
 		ScopeMetadata scopeMetadata = this.scopeMetadataResolver.resolveScopeMetadata(abd);
 		abd.setScope(scopeMetadata.getScopeName());
 		String beanName = (name != null ? name : this.beanNameGenerator.generateBeanName(abd, this.registry));
