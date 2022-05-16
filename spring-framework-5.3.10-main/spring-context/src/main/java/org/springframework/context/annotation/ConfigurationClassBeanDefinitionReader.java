@@ -126,6 +126,7 @@ class ConfigurationClassBeanDefinitionReader {
 	public void loadBeanDefinitions(Set<ConfigurationClass> configurationModel) {
 		TrackedConditionEvaluator trackedConditionEvaluator = new TrackedConditionEvaluator();
 		for (ConfigurationClass configClass : configurationModel) {
+			// ! 生成beanDefinition
 			loadBeanDefinitionsForConfigurationClass(configClass, trackedConditionEvaluator);
 		}
 	}
@@ -147,20 +148,20 @@ class ConfigurationClassBeanDefinitionReader {
 		}
 
 		if (configClass.isImported()) {
-			// 将被导入的类生成BeanDefinition并注册到Spring容器中
-			// @Component的内部类，@Import所导入的类都是被导入的类
+			// ! 将被导入的类生成BeanDefinition并注册到Spring容器中
+			// # @Component的内部类，@Import所导入的类都是被导入的类
 			registerBeanDefinitionForImportedConfigurationClass(configClass);
 		}
 
-		// @Bean生成BeanDefinition并注册
+		// # @Bean生成BeanDefinition并注册
 		for (BeanMethod beanMethod : configClass.getBeanMethods()) {
 			loadBeanDefinitionsForBeanMethod(beanMethod);
 		}
 
-		// 处理@ImportResource("spring.xml")
+		// # 处理@ImportResource("spring.xml")
 		loadBeanDefinitionsFromImportedResources(configClass.getImportedResources());
 
-		// 处理ImportBeanDefinitionRegistrar，调用registerBeanDefinitions()方法
+		// # 处理ImportBeanDefinitionRegistrar，调用registerBeanDefinitions()方法
 		loadBeanDefinitionsFromRegistrars(configClass.getImportBeanDefinitionRegistrars());
 	}
 
@@ -177,7 +178,7 @@ class ConfigurationClassBeanDefinitionReader {
 		AnnotationConfigUtils.processCommonDefinitionAnnotations(configBeanDef, metadata);
 
 		BeanDefinitionHolder definitionHolder = new BeanDefinitionHolder(configBeanDef, configBeanName);
-		// 如果@Scope中设置了proxymodel=class，那么definitionHolder将为ScopedProxyFactoryBean类型
+		// # 如果@Scope中设置了proxymodel=class，那么definitionHolder将为ScopedProxyFactoryBean类型
 		definitionHolder = AnnotationConfigUtils.applyScopedProxyMode(scopeMetadata, definitionHolder, this.registry);
 		this.registry.registerBeanDefinition(definitionHolder.getBeanName(), definitionHolder.getBeanDefinition());
 		configClass.setBeanName(configBeanName);
@@ -219,10 +220,10 @@ class ConfigurationClassBeanDefinitionReader {
 		}
 
 		// Has this effectively been overridden before (e.g. via XML)?
-		// 如果出现了两个@Bean修改的方法名字一样（比如方法重载了），则直接return，并且会把已经存在的BeanDefinition的isFactoryMethodUnique为false
+		// # 如果出现了两个@Bean修改的方法名字一样（比如方法重载了），则直接return，并且会把已经存在的BeanDefinition的isFactoryMethodUnique为false
 		if (isOverriddenByExistingDefinition(beanMethod, beanName)) {
 
-			// 如果beanName等于"appConfig"，就会抛异常
+			// # 如果beanName等于"appConfig"，就会抛异常
 			if (beanName.equals(beanMethod.getConfigurationClass().getBeanName())) {
 				throw new BeanDefinitionStoreException(beanMethod.getConfigurationClass().getResource().getDescription(),
 						beanName, "Bean name derived from @Bean method '" + beanMethod.getMetadata().getMethodName() +

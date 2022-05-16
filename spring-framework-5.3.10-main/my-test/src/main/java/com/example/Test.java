@@ -10,7 +10,9 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 public class Test {
 
 	public static void main(String[] args) {
-		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(AppConfig.class);
+		AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext();
+		context.register(AppConfig.class);
+		context.refresh();
 		User user = (User) context.getBean("user", new User());
 		System.out.println(user);
 	}

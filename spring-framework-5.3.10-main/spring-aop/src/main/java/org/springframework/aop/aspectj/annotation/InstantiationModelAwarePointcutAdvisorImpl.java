@@ -147,6 +147,8 @@ final class InstantiationModelAwarePointcutAdvisorImpl
 	}
 
 	private Advice instantiateAdvice(AspectJExpressionPointcut pointcut) {
+		// ! aspectJAdviceMethod是构造Advisor时的方法，用它来构造出Advice, getAdvice就是解析注解的地方
+		// # 对应着 after around method before throws这些
 		Advice advice = this.aspectJAdvisorFactory.getAdvice(this.aspectJAdviceMethod, pointcut,
 				this.aspectInstanceFactory, this.declarationOrder, this.aspectName);
 		return (advice != null ? advice : EMPTY_ADVICE);

@@ -89,9 +89,9 @@ final class PostProcessorRegistrationDelegate {
 			List<BeanFactoryPostProcessor> regularPostProcessors = new ArrayList<>();
 			List<BeanDefinitionRegistryPostProcessor> registryProcessors = new ArrayList<>();
 
-			// beanFactoryPostProcessors集合一般情况下都是空的，除非我们手动调用容器的addBeanFactoryPostProcessor方法添加了
-			// beanFactoryPostProcessors中可能包含了：普通BeanFactoryPostProcessor对象和BeanDefinitionRegistryPostProcessor对象
-			// 对于BeanDefinitionRegistryPostProcessor对象，会执行自己的postProcessBeanDefinitionRegistry()方法
+			// # beanFactoryPostProcessors集合一般情况下都是空的，除非我们手动调用容器的addBeanFactoryPostProcessor方法添加了
+			// # beanFactoryPostProcessors中可能包含了：普通BeanFactoryPostProcessor对象和BeanDefinitionRegistryPostProcessor对象
+			// # 对于BeanDefinitionRegistryPostProcessor对象，会执行自己的postProcessBeanDefinitionRegistry()方法
 			for (BeanFactoryPostProcessor postProcessor : beanFactoryPostProcessors) {
 				if (postProcessor instanceof BeanDefinitionRegistryPostProcessor) {
 					BeanDefinitionRegistryPostProcessor registryProcessor =

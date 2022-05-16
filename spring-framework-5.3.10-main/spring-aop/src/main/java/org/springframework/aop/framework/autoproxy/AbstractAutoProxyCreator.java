@@ -259,13 +259,13 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		// Create proxy here if we have a custom TargetSource.
 		// Suppresses unnecessary default instantiation of the target bean:
 		// The TargetSource will handle target instances in a custom fashion.
-		// 这里是BeanNameAutoProxyCreator的判断逻辑
+		// # 这里是BeanNameAutoProxyCreator的判断逻辑
 		TargetSource targetSource = getCustomTargetSource(beanClass, beanName);
 		if (targetSource != null) {
 			if (StringUtils.hasLength(beanName)) {
 				this.targetSourcedBeans.add(beanName);
 			}
-			// 直接去生成代理对象
+			// # 直接去生成代理对象
 			Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(beanClass, beanName, targetSource);
 			Object proxy = createProxy(beanClass, beanName, specificInterceptors, targetSource);
 			this.proxyTypes.put(cacheKey, proxy.getClass());
@@ -331,12 +331,12 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 			return bean;
 		}
 
-		// advisedBeans表示已经判断过了的bean，false表示此bean不需要进行Aop
+		// # advisedBeans表示已经判断过了的bean，false表示此bean不需要进行Aop
 		if (Boolean.FALSE.equals(this.advisedBeans.get(cacheKey))) {
 			return bean;
 		}
 
-		// 当前正在创建的Bean不用进行AOP，比如切面Bean
+		// # 当前正在创建的Bean不用进行AOP，比如切面Bean
 		if (isInfrastructureClass(bean.getClass()) || shouldSkip(bean.getClass(), beanName)) {
 			this.advisedBeans.put(cacheKey, Boolean.FALSE);
 			return bean;
@@ -345,6 +345,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 		// Create proxy if we have advice.
 		// # 判断当前bean是否存在匹配的advice，如果存在则要生成一个代理对象
 		// # 此处根据类以及类中的方法去匹配到Interceptor（也就是Advice），然后生成代理对象，代理对象在执行的时候，还会根据当前执行的方法去匹配
+		// ! 判断是否需要进行AOP
 		Object[] specificInterceptors = getAdvicesAndAdvisorsForBean(bean.getClass(), beanName, null);
 		if (specificInterceptors != DO_NOT_PROXY) {
 			// # advisedBeans记录了某个Bean已经进行过AOP了
@@ -608,7 +609,7 @@ public abstract class AbstractAutoProxyCreator extends ProxyProcessorSupport
 	 * @see #PROXY_WITHOUT_ADDITIONAL_INTERCEPTORS
 	 */
 	@Nullable
-	// 模板方法
+	// ! 模板方法
 	protected abstract Object[] getAdvicesAndAdvisorsForBean(Class<?> beanClass, String beanName,
 			@Nullable TargetSource customTargetSource) throws BeansException;
 
