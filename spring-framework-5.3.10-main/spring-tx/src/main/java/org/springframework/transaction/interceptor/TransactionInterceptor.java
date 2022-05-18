@@ -116,11 +116,12 @@ public class TransactionInterceptor extends TransactionAspectSupport implements 
 		Class<?> targetClass = (invocation.getThis() != null ? AopUtils.getTargetClass(invocation.getThis()) : null);
 
 		// Adapt to TransactionAspectSupport's invokeWithinTransaction...
+		// ! 处理事务
 		return invokeWithinTransaction(invocation.getMethod(), targetClass, new CoroutinesInvocationCallback() {
 			@Override
 			@Nullable
 			public Object proceedWithInvocation() throws Throwable {
-				// 执行后续的Interceptor，以及被代理的方法
+				// ! 执行后续的Interceptor，以及被代理的方法
 				return invocation.proceed(); // test() sql
 			}
 			@Override

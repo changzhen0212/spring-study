@@ -37,6 +37,7 @@ import org.springframework.util.ObjectUtils;
 abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPointcut implements Serializable {
 
 	protected TransactionAttributeSourcePointcut() {
+		// ! 匹配规则
 		setClassFilter(new TransactionAttributeSourceClassFilter());
 	}
 
@@ -92,6 +93,7 @@ abstract class TransactionAttributeSourcePointcut extends StaticMethodMatcherPoi
 				return false;
 			}
 			TransactionAttributeSource tas = getTransactionAttributeSource();
+			// ! isCandidateClass 查看实现
 			return (tas == null || tas.isCandidateClass(clazz));
 		}
 	}

@@ -959,6 +959,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		}
 
 		try {
+			// !!! 核心的调度doDispatch， 体现了SpringMVC整个流程
 			doDispatch(request, response);
 		}
 		finally {
@@ -1035,14 +1036,14 @@ public class DispatcherServlet extends FrameworkServlet {
 				processedRequest = checkMultipart(request);
 				multipartRequestParsed = (processedRequest != request);
 
-				// 进行映射
+				// # 进行映射
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
 					noHandlerFound(processedRequest, response);
 					return;
 				}
 
-				// 找到最合适的HandlerAdapter
+				// # 找到最合适的HandlerAdapter
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.  HTTP缓存相关
@@ -1054,9 +1055,9 @@ public class DispatcherServlet extends FrameworkServlet {
 						return;
 					}
 				}
-				// 前置拦截器
+				// # 前置拦截器
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
-					// 返回false就不进行后续处理了
+					// # 返回false就不进行后续处理了
 					return;
 				}
 
@@ -1066,9 +1067,9 @@ public class DispatcherServlet extends FrameworkServlet {
 				if (asyncManager.isConcurrentHandlingStarted()) {
 					return;
 				}
-				// 如果mv有  视图没有，给你设置默认视图
+				// # 如果mv有  视图没有，给你设置默认视图
 				applyDefaultViewName(processedRequest, mv);
-				//后置拦截器
+				// # 后置拦截器
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -1079,7 +1080,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				// making them available for @ExceptionHandler methods and other scenarios.
 				dispatchException = new NestedServletException("Handler dispatch failed", err);
 			}
-			// 渲染视图
+			// # 渲染视图
 			processDispatchResult(processedRequest, response, mappedHandler, mv, dispatchException);
 		}
 		catch (Exception ex) {

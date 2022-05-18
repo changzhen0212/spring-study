@@ -345,18 +345,21 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 		// Use defaults if no transaction definition given.
 		TransactionDefinition def = (definition != null ? definition : TransactionDefinition.withDefaults());
 
-		// 得到一个新的DataSourceTransactionObject对象
+		// # 得到一个新的DataSourceTransactionObject对象
 		// new DataSourceTransactionObject  txObject
 		Object transaction = doGetTransaction();
 		boolean debugEnabled = logger.isDebugEnabled();
 
 		// transaction.getConnectionHolder().isTransactionActive()
+		// # 是否存在一个事务
 		if (isExistingTransaction(transaction)) {
 			// Existing transaction found -> check propagation behavior to find out how to behave.
+			// ! 如果存在事务，进入这里
 			return handleExistingTransaction(def, transaction, debugEnabled);
 		}
 
 		// Check definition settings for new transaction.
+		// # 超时时间
 		if (def.getTimeout() < TransactionDefinition.TIMEOUT_DEFAULT) {
 			throw new InvalidTimeoutException("Invalid transaction timeout", def.getTimeout());
 		}
@@ -366,19 +369,19 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			throw new IllegalTransactionStateException(
 					"No existing transaction found for transaction marked with propagation 'mandatory'");
 		}
-		// 在当前Thread中没有事务的前提下，以下三个是等价的
+		// # 在当前Thread中没有事务的前提下，以下三个是等价的
 		else if (def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRED ||
 				def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_REQUIRES_NEW ||
 				def.getPropagationBehavior() == TransactionDefinition.PROPAGATION_NESTED) {
-			// 没有事务需要挂起，不过TransactionSynchronization有可能需要挂起
-			// suspendedResources表示当前线程被挂起的资源持有对象（数据库连接、TransactionSynchronization）
+			// # 没有事务需要挂起，不过TransactionSynchronization有可能需要挂起
+			// ! suspendedResources表示当前线程被挂起的资源持有对象（数据库连接、TransactionSynchronization）
 			SuspendedResourcesHolder suspendedResources = suspend(null);
 			if (debugEnabled) {
 				logger.debug("Creating new transaction with name [" + def.getName() + "]: " + def);
 			}
 			try {
-				// 开启事务后，transaction中就会有数据库连接了，并且isTransactionActive为true
-				// 并返回TransactionStatus对象，该对象保存了很多信息，包括被挂起的资源
+				// # 开启事务后，transaction中就会有数据库连接了，并且isTransactionActive为true
+				// # 并返回TransactionStatus对象，该对象保存了很多信息，包括被挂起的资源
 				return startTransaction(def, transaction, debugEnabled, suspendedResources);
 			}
 			catch (RuntimeException | Error ex) {
@@ -435,7 +438,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			if (debugEnabled) {
 				logger.debug("Suspending current transaction");
 			}
-			// 把当前事务挂起，其中就会把数据库连接对象从ThreadLocal中移除
+			// ! 把当前事务挂起，其中就会把数据库连接对象从ThreadLocal中移除
 			Object suspendedResources = suspend(transaction);
 			boolean newSynchronization = (getTransactionSynchronization() == SYNCHRONIZATION_ALWAYS);
 			return prepareTransactionStatus(
@@ -472,7 +475,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 				// Usually uses JDBC 3.0 savepoints. Never activates Spring synchronization.
 				DefaultTransactionStatus status =
 						prepareTransactionStatus(definition, transaction, false, false, debugEnabled, null);
-				// 创建一个savepoint
+				// # 创建一个savepoint
 				status.createAndHoldSavepoint();
 				return status;
 			}
@@ -508,7 +511,7 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 			}
 		}
 
-		// 如果依然是Propagation.REQUIRED
+		// # 如果依然是Propagation.REQUIRED
 		boolean newSynchronization = (getTransactionSynchronization() != SYNCHRONIZATION_NEVER);
 		return prepareTransactionStatus(definition, transaction, false, newSynchronization, debugEnabled, null);
 	}
@@ -587,11 +590,11 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 */
 	@Nullable
 	protected final SuspendedResourcesHolder suspend(@Nullable Object transaction) throws TransactionException {
-		// synchronizations是一个ThreadLocal<Set<TransactionSynchronization>>
-		// 我们可以在任何地方通过TransactionSynchronizationManager给当前线程添加TransactionSynchronization，
+		// # synchronizations是一个ThreadLocal<Set<TransactionSynchronization>>
+		// # 我们可以在任何地方通过TransactionSynchronizationManager给当前线程添加TransactionSynchronization，
 
 		if (TransactionSynchronizationManager.isSynchronizationActive()) {
-			// 调用TransactionSynchronization的suspend方法，并清空和返回当前线程中所有的TransactionSynchronization对象
+			// ! 调用TransactionSynchronization的suspend方法，并清空和返回当前线程中所有的TransactionSynchronization对象
 			List<TransactionSynchronization> suspendedSynchronizations = doSuspendSynchronization();
 			try {
 				Object suspendedResources = null;
@@ -684,19 +687,19 @@ public abstract class AbstractPlatformTransactionManager implements PlatformTran
 	 * @return the List of suspended TransactionSynchronization objects
 	 */
 	private List<TransactionSynchronization> doSuspendSynchronization() {
-		// 从synchronizations（一个ThreadLocal）中拿到所设置的TransactionSynchronization对象
+		// # 从synchronizations（一个ThreadLocal）中拿到所设置的TransactionSynchronization对象
 		List<TransactionSynchronization> suspendedSynchronizations =
 				TransactionSynchronizationManager.getSynchronizations();
 
-		// 调用TransactionSynchronization对象的suspend()
+		// # 调用TransactionSynchronization对象的suspend()
 		for (TransactionSynchronization synchronization : suspendedSynchronizations) {
 			synchronization.suspend();
 		}
 
-		// 清空synchronizations
+		// # 清空synchronizations
 		TransactionSynchronizationManager.clearSynchronization();
 
-		// 把获取到的TransactionSynchronization返回
+		// # 把获取到的TransactionSynchronization返回
 		return suspendedSynchronizations;
 	}
 
