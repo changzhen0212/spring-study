@@ -1036,14 +1036,14 @@ public class DispatcherServlet extends FrameworkServlet {
 				processedRequest = checkMultipart(request);
 				multipartRequestParsed = (processedRequest != request);
 
-				// # 进行映射
+				// ! 进行映射
 				mappedHandler = getHandler(processedRequest);
 				if (mappedHandler == null) {
 					noHandlerFound(processedRequest, response);
 					return;
 				}
 
-				// # 找到最合适的HandlerAdapter
+				// ! 找到最合适的HandlerAdapter
 				HandlerAdapter ha = getHandlerAdapter(mappedHandler.getHandler());
 
 				// Process last-modified header, if supported by the handler.  HTTP缓存相关
@@ -1055,13 +1055,14 @@ public class DispatcherServlet extends FrameworkServlet {
 						return;
 					}
 				}
-				// # 前置拦截器
+				// ! 前置拦截器
 				if (!mappedHandler.applyPreHandle(processedRequest, response)) {
 					// # 返回false就不进行后续处理了
 					return;
 				}
 
 				// Actually invoke the handler.
+				// ! 进入实现处理， 通常是 AbstractHandlerMethodAdapter
 				mv = ha.handle(processedRequest, response, mappedHandler.getHandler());
 
 				if (asyncManager.isConcurrentHandlingStarted()) {
@@ -1128,7 +1129,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 		boolean errorView = false;
 
-		// 异常视图
+		// # 异常视图
 		if (exception != null) {
 			if (exception instanceof ModelAndViewDefiningException) {
 				logger.debug("ModelAndViewDefiningException encountered", exception);
@@ -1143,7 +1144,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 		// Did the handler return a view to render?
 		if (mv != null && !mv.wasCleared()) {
-			// 解析、渲染视图
+			// # 解析、渲染视图
 			render(mv, request, response);
 			if (errorView) {
 				WebUtils.clearErrorRequestAttributes(request);
@@ -1259,9 +1260,10 @@ public class DispatcherServlet extends FrameworkServlet {
 	@Nullable
 	protected HandlerExecutionChain getHandler(HttpServletRequest request) throws Exception {
 		if (this.handlerMappings != null) {
-			/** 拿到所有handlerMappings （容器启动阶段初始化：拿到所有实现了HandlerMapping的Bean）
+			/**
+			 * # 拿到所有handlerMappings （容器启动阶段初始化：拿到所有实现了HandlerMapping的Bean）
 			 * @see DispatcherServlet#initHandlerMappings
-			 * 测试发现： 不同的HandlerMapping可以有相同path, 谁先解析到就用哪个
+			 * # 测试发现： 不同的HandlerMapping可以有相同path, 谁先解析到就用哪个
 			 * */
 			for (HandlerMapping mapping : this.handlerMappings) {
 				HandlerExecutionChain handler = mapping.getHandler(request);
@@ -1379,7 +1381,7 @@ public class DispatcherServlet extends FrameworkServlet {
 		View view;
 		String viewName = mv.getViewName();
 		if (viewName != null) {
-			// 解析视图名
+			// # 解析视图名
 			view = resolveViewName(viewName, mv.getModelInternal(), locale, request);
 			if (view == null) {
 				throw new ServletException("Could not resolve view with name '" + mv.getViewName() +

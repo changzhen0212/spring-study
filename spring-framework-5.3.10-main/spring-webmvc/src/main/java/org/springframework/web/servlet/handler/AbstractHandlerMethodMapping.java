@@ -219,14 +219,14 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @see #handlerMethodsInitialized
 	 */
 	protected void initHandlerMethods() {
-		// 获得所有候选beanName—— 当前容器所有的beanName
+		// # 获得所有候选beanName—— 当前容器所有的beanName
 		for (String beanName : getCandidateBeanNames()) {
 			if (!beanName.startsWith(SCOPED_TARGET_NAME_PREFIX)) {
-				// *处理候选bean——即解析@RequestMapping和映射路径
+				// ! 处理候选bean——即解析@RequestMapping和映射路径
 				processCandidateBean(beanName);
 			}
 		}
-		// 解析完所有@RequestMapping的时候调用
+		// # 解析完所有@RequestMapping的时候调用
 		handlerMethodsInitialized(getHandlerMethods());
 	}
 
@@ -253,6 +253,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * @see #isHandler
 	 * @see #detectHandlerMethods
 	 */
+	// ! 处理候选bean——即解析@RequestMapping和映射路径
 	protected void processCandidateBean(String beanName) {
 		Class<?> beanType = null;
 		try {
@@ -264,9 +265,9 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 				logger.trace("Could not resolve type for bean '" + beanName + "'", ex);
 			}
 		}
-		// 这一步判断是关键  是否有Controller 或 RequestMapping注解
+		// # 这一步判断是关键  是否有Controller 或 RequestMapping注解
 		if (beanType != null && isHandler(beanType)) {
-			// 解析HandlerMethods
+			// # 解析HandlerMethods
 			detectHandlerMethods(beanName);
 		}
 	}
@@ -282,10 +283,11 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 		if (handlerType != null) {
 			Class<?> userType = ClassUtils.getUserClass(handlerType);
-			// 循环所有方法
+			// # 循环所有方法
 			Map<Method, T> methods = MethodIntrospector.selectMethods(userType,
 					(MethodIntrospector.MetadataLookup<T>) method -> {
 						try {
+							// ! 进入 RequestMappingHandlerMapping 实现
 							return getMappingForMethod(method, userType);
 						}
 						catch (Throwable ex) {
@@ -299,8 +301,10 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 			else if (mappingsLogger.isDebugEnabled()) {
 				mappingsLogger.debug(formatMappings(userType, methods));
 			}
+			// ! 再次循环，加入到两个map中
 			methods.forEach((method, mapping) -> {
 				Method invocableMethod = AopUtils.selectInvocableMethod(method, userType);
+				// !
 				registerHandlerMethod(handler, invocableMethod, mapping);
 			});
 		}
@@ -331,6 +335,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 * under the same mapping
 	 */
 	protected void registerHandlerMethod(Object handler, Method method, T mapping) {
+		// !
 		this.mappingRegistry.register(mapping, handler, method);
 	}
 
@@ -364,7 +369,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 	 */
 	protected void handlerMethodsInitialized(Map<T, HandlerMethod> handlerMethods) {
 		// Total includes detected mappings + explicit registrations via registerMapping
-		// 这个方法没做什么， 就是记录  哪个Bean有多少个映射
+		// # 这个方法没做什么， 就是记录  哪个Bean有多少个映射
 		int total = handlerMethods.size();
 		if ((logger.isTraceEnabled() && total == 0) || (logger.isDebugEnabled() && total > 0) ) {
 			logger.debug(total + " mappings in " + formatMappingName());
@@ -665,6 +670,7 @@ public abstract class AbstractHandlerMethodMapping<T> extends AbstractHandlerMap
 
 				Set<String> directPaths = AbstractHandlerMethodMapping.this.getDirectPaths(mapping);
 				for (String path : directPaths) {
+					// # key-地址，value-RequestMappingInfo
 					this.pathLookup.add(path, mapping);
 				}
 
