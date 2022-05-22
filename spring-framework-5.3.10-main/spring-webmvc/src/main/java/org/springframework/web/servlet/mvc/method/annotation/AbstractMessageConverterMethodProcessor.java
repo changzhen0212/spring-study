@@ -227,8 +227,8 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 				}
 				throw ex;
 			}
-			// 如果没有设置MediaType
-			// 通过HttpMessageConverter 介入、找到最合适的HttpMessageConverter， 获取对应设定的MediaType
+			// # 如果没有设置MediaType
+			// # 通过HttpMessageConverter 介入、找到最合适的HttpMessageConverter， 获取对应设定的MediaType
 			List<MediaType> producibleTypes = getProducibleMediaTypes(request, valueType, targetType);
 
 			if (body != null && producibleTypes.isEmpty()) {
@@ -274,10 +274,12 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 
 		if (selectedMediaType != null) {
 			selectedMediaType = selectedMediaType.removeQualityValue();
+			// # 遍历所有的 messageConverters
 			for (HttpMessageConverter<?> converter : this.messageConverters) {
 				GenericHttpMessageConverter genericConverter = (converter instanceof GenericHttpMessageConverter ?
 						(GenericHttpMessageConverter<?>) converter : null);
 				if (genericConverter != null ?
+						// # 判断是否可以写
 						((GenericHttpMessageConverter) converter).canWrite(targetType, valueType, selectedMediaType) :
 						converter.canWrite(valueType, selectedMediaType)) {
 					body = getAdvice().beforeBodyWrite(body, returnType, selectedMediaType,
@@ -289,9 +291,11 @@ public abstract class AbstractMessageConverterMethodProcessor extends AbstractMe
 								"Writing [" + LogFormatUtils.formatValue(theBody, !traceOn) + "]");
 						addContentDispositionHeader(inputMessage, outputMessage);
 						if (genericConverter != null) {
+							// # 调用 write
 							genericConverter.write(body, targetType, selectedMediaType, outputMessage);
 						}
 						else {
+							// # 调用 write
 							((HttpMessageConverter) converter).write(body, selectedMediaType, outputMessage);
 						}
 					}

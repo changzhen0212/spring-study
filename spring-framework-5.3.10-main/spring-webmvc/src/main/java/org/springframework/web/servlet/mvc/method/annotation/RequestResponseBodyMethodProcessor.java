@@ -108,11 +108,12 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 	}
 
 
+	// # 判断参数上是否有 RequestBody
 	@Override
 	public boolean supportsParameter(MethodParameter parameter) {
 		return parameter.hasParameterAnnotation(RequestBody.class);
 	}
-	// 判断方法或者类上面有没有ResponseBody
+	// # 判断方法或者类上面有没有ResponseBody
 	@Override
 	public boolean supportsReturnType(MethodParameter returnType) {
 		return (AnnotatedElementUtils.hasAnnotation(returnType.getContainingClass(), ResponseBody.class) ||
@@ -179,7 +180,7 @@ public class RequestResponseBodyMethodProcessor extends AbstractMessageConverter
 		ServletServerHttpRequest inputMessage = createInputMessage(webRequest);
 		ServletServerHttpResponse outputMessage = createOutputMessage(webRequest);
 
-		// 通过MessageConverters 写数据
+		// ! 通过MessageConverters 写数据
 		writeWithMessageConverters(returnValue, returnType, inputMessage, outputMessage);
 	}
 

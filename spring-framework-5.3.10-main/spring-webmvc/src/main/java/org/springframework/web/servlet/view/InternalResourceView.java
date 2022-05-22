@@ -138,17 +138,20 @@ public class InternalResourceView extends AbstractUrlBasedView {
 	protected void renderMergedOutputModel(
 			Map<String, Object> model, HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		// Expose the model object as request attributes. 将model设置到request的attribute中.
+		// Expose the model object as request attributes.
+		// ! 将model设置到request的attribute中.
 		exposeModelAsRequestAttributes(model, request);
 
-		// Expose helpers as request attributes, if any.  设置国际化资源
+		// Expose helpers as request attributes, if any.
+		// # 设置国际化资源
 		exposeHelpers(request);
 
-		// Determine the path for the request dispatcher.  防止死循环请求
+		// Determine the path for the request dispatcher.
+		// ! 防止死循环请求
 		String dispatcherPath = prepareForRendering(request, response);
 
 		// Obtain a RequestDispatcher for the target resource (typically a JSP).
-		// 通过request拿到RequestDispatcher request.getRequestDispacther("/test.jsp")
+		// # 通过request拿到RequestDispatcher request.getRequestDispacther("/test.jsp")
 		RequestDispatcher rd = getRequestDispatcher(request, dispatcherPath);
 		if (rd == null) {
 			throw new ServletException("Could not get RequestDispatcher for [" + getUrl() +
@@ -168,7 +171,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 			// Note: The forwarded resource is supposed to determine the content type itself.
 			if (logger.isDebugEnabled()) {
 				logger.debug("Forwarding to [" + getUrl() + "]");
-			} // RequestDispatcher.forward直接转发，就这么简单粗暴
+			} // # RequestDispatcher.forward直接转发，就这么简单粗暴
 			rd.forward(request, response);
 		}
 	}
@@ -204,7 +207,7 @@ public class InternalResourceView extends AbstractUrlBasedView {
 
 		String path = getUrl();
 		Assert.state(path != null, "'url' not set");
-		// 防止死循环请求
+		// # 防止死循环请求
 		if (this.preventDispatchLoop) {
 			String uri = request.getRequestURI();
 			if (path.startsWith("/") ? uri.equals(path) : uri.equals(StringUtils.applyRelativePath(uri, path))) {

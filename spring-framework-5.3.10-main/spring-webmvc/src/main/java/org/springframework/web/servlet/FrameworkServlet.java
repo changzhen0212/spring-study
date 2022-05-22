@@ -527,6 +527,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 		long startTime = System.currentTimeMillis();
 
 		try {
+			// ! 初始化web上下文
 			this.webApplicationContext = initWebApplicationContext();
 			// 无实现
 			initFrameworkServlet();
@@ -559,45 +560,46 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * @see #setContextConfigLocation
 	 */
 	protected WebApplicationContext initWebApplicationContext() {
-		// 获得ContextLoaderListener存的父容器
+		// # 获得ContextLoaderListener存的父容器
 		WebApplicationContext rootContext =
 				WebApplicationContextUtils.getWebApplicationContext(getServletContext());
 		WebApplicationContext wac = null;
 
 		if (this.webApplicationContext != null) {
-			// 获得子容器
+			// # 获得子容器
 			wac = this.webApplicationContext;
 			if (wac instanceof ConfigurableWebApplicationContext) {
 				ConfigurableWebApplicationContext cwac = (ConfigurableWebApplicationContext) wac;
 				if (!cwac.isActive()) {
-					// 如果没有设置父容器   spring  doGetBean
+					// # 如果没有设置父容器   spring  doGetBean
 					if (cwac.getParent() == null) {
 						cwac.setParent(rootContext);
 					}
-					// 配置并且加载子容器
+					// ! 配置并且加载子容器
 					configureAndRefreshWebApplicationContext(cwac);
 				}
 			}
 		}
 		if (wac == null) {
-			// 从servlet上下文根据<contextAttribute>名字从域里面获取
+			// # 从servlet上下文根据<contextAttribute>名字从域里面获取
 			wac = findWebApplicationContext();
 		}
 		if (wac == null) {
-			// xml会在这里创建
+			// # xml会在这里创建
 			wac = createWebApplicationContext(rootContext);
 		}
 
-		//refreshEventReceived 它会在容器加载完设置为true (通过事件onApplicationEvent)
-		// springboot在这初始化组件
+		// # refreshEventReceived 它会在容器加载完设置为true (通过事件onApplicationEvent)
+		// # springboot在这初始化组件
 		if (!this.refreshEventReceived) {
 			synchronized (this.onRefreshMonitor) {
+				// !
 				onRefresh(wac);
 			}
 		}
 
 		if (this.publishContext) {
-			// 将当前容器放到servlet域中， 可以再创建子容器
+			// # 将当前容器放到servlet域中， 可以再创建子容器
 			String attrName = getServletContextAttributeName();
 			getServletContext().setAttribute(attrName, wac);
 		}
@@ -668,7 +670,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 	protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac) {
 		if (ObjectUtils.identityToString(wac).equals(wac.getId())) {
-			// 设置id
+			// # 设置id
 			if (this.contextId != null) {
 				wac.setId(this.contextId);
 			}
@@ -678,21 +680,23 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 						ObjectUtils.getDisplayString(getServletContext().getContextPath()) + '/' + getServletName());
 			}
 		}
-		// 设置servlet上下文
+		// # 设置servlet上下文
 		wac.setServletContext(getServletContext());
+		// # 设置ServletConfig配置
 		wac.setServletConfig(getServletConfig());
 		wac.setNamespace(getNamespace());
-		// 监听器  委托设计模式
+		// # 添加监听器  委托设计模式
+		// * ContextRefreshListener这个监听器会加载SpringMVC的组件，比如HandlerMapping HandlerAdapter等
 		wac.addApplicationListener(new SourceFilteringListener(wac, new ContextRefreshListener()));
 
-		// 将init-param设置到Environment中
+		// # 将init-param设置到Environment中
 		ConfigurableEnvironment env = wac.getEnvironment();
 		if (env instanceof ConfigurableWebEnvironment) {
 			((ConfigurableWebEnvironment) env).initPropertySources(getServletContext(), getServletConfig());
 		}
-		// 空方法可扩展
+		// # 空方法可扩展
 		postProcessWebApplicationContext(wac);
-		// 容器启动前初始化
+		// # 容器启动前初始化
 		applyInitializers(wac);
 		wac.refresh();
 	}
@@ -831,9 +835,11 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 	 * triggering a refresh of this servlet's context-dependent state.
 	 * @param event the incoming ApplicationContext event
 	 */
+	// # ContextRefreshedEvent 事件会在容器加载完成后调用
 	public void onApplicationEvent(ContextRefreshedEvent event) {
 		this.refreshEventReceived = true;
 		synchronized (this.onRefreshMonitor) {
+			// ! 进入 DispatcherServlet 实现的 onRefresh方法
 			onRefresh(event.getApplicationContext());
 		}
 	}
@@ -1184,6 +1190,7 @@ public abstract class FrameworkServlet extends HttpServletBean implements Applic
 
 		@Override
 		public void onApplicationEvent(ContextRefreshedEvent event) {
+			// ! onApplicationEvent
 			FrameworkServlet.this.onApplicationEvent(event);
 		}
 	}

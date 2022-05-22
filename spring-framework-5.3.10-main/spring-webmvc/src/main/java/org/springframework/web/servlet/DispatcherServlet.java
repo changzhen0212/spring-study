@@ -486,10 +486,12 @@ public class DispatcherServlet extends FrameworkServlet {
 	 */
 	@Override
 	protected void onRefresh(ApplicationContext context) {
+		// ! 初始化策略, 把组件设置到`DispatcherServlet`里面去，之后请求`DispatcherServlet`时才会拿到响应的组件进行相应的流程处理
 		initStrategies(context);
 	}
 
-	/**初始化策略,加了s都是多个
+	/**
+	 * # 初始化策略,加了s都是多个
 	 * Initialize the strategy objects that this servlet uses.
 	 * <p>May be overridden in subclasses in order to initialize further strategy objects.
 	 */
@@ -587,9 +589,10 @@ public class DispatcherServlet extends FrameworkServlet {
 	private void initHandlerMappings(ApplicationContext context) {
 		this.handlerMappings = null;
 
-		// 根据类型（多个）   默认true
+		// # 根据类型（多个）   默认true
 		if (this.detectAllHandlerMappings) {
 			// Find all HandlerMappings in the ApplicationContext, including ancestor contexts.
+			// # 先从容器中拿
 			Map<String, HandlerMapping> matchingBeans =
 					BeanFactoryUtils.beansOfTypeIncludingAncestors(context, HandlerMapping.class, true, false);
 			if (!matchingBeans.isEmpty()) {
@@ -598,7 +601,7 @@ public class DispatcherServlet extends FrameworkServlet {
 				AnnotationAwareOrderComparator.sort(this.handlerMappings);
 			}
 		}
-		// 根据名字（唯一）
+		// # 根据名字（唯一）
 		else {
 			try {
 				HandlerMapping hm = context.getBean(HANDLER_MAPPING_BEAN_NAME, HandlerMapping.class);
@@ -609,7 +612,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			}
 		}
 
-		// 如果没有配 ， 就去DispatcherServlet.properties拿默认的
+		// # 如果没有配 ， 就去DispatcherServlet.properties拿默认的
 		if (this.handlerMappings == null) {
 			this.handlerMappings = getDefaultStrategies(context, HandlerMapping.class);
 			if (logger.isTraceEnabled()) {
@@ -862,7 +865,7 @@ public class DispatcherServlet extends FrameworkServlet {
 	protected <T> List<T> getDefaultStrategies(ApplicationContext context, Class<T> strategyInterface) {
 		if (defaultStrategies == null) {
 			try {
-				// 通过PropertiesLoaderUtils工具类加载DispatcherServlet.properties
+				// # 通过PropertiesLoaderUtils工具类加载DispatcherServlet.properties
 				ClassPathResource resource = new ClassPathResource(DEFAULT_STRATEGIES_PATH, DispatcherServlet.class);
 				defaultStrategies = PropertiesLoaderUtils.loadProperties(resource);
 			}
@@ -1068,9 +1071,9 @@ public class DispatcherServlet extends FrameworkServlet {
 				if (asyncManager.isConcurrentHandlingStarted()) {
 					return;
 				}
-				// # 如果mv有  视图没有，给你设置默认视图
+				// ! 如果mv有  视图没有，给你设置默认视图
 				applyDefaultViewName(processedRequest, mv);
-				// # 后置拦截器
+				// ! 后置拦截器
 				mappedHandler.applyPostHandle(processedRequest, response, mv);
 			}
 			catch (Exception ex) {
@@ -1144,7 +1147,7 @@ public class DispatcherServlet extends FrameworkServlet {
 
 		// Did the handler return a view to render?
 		if (mv != null && !mv.wasCleared()) {
-			// # 解析、渲染视图
+			// ! 解析、渲染视图
 			render(mv, request, response);
 			if (errorView) {
 				WebUtils.clearErrorRequestAttributes(request);
@@ -1266,6 +1269,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			 * # 测试发现： 不同的HandlerMapping可以有相同path, 谁先解析到就用哪个
 			 * */
 			for (HandlerMapping mapping : this.handlerMappings) {
+				// ! getHandler
 				HandlerExecutionChain handler = mapping.getHandler(request);
 				if (handler != null) {
 					return handler;
@@ -1405,6 +1409,7 @@ public class DispatcherServlet extends FrameworkServlet {
 			if (mv.getStatus() != null) {
 				response.setStatus(mv.getStatus().value());
 			}
+			// ! 进入AbstractView 实现
 			view.render(mv.getModelInternal(), request, response);
 		}
 		catch (Exception ex) {

@@ -148,12 +148,12 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 		if (webAppInitializerClasses != null) {
 			initializers = new ArrayList<>(webAppInitializerClasses.size());
 			for (Class<?> waiClass : webAppInitializerClasses) {
-				// 接口和抽象类servlet容器也会给我们，但是我们不要
-				// 排除接口和容器
+				// # 接口和抽象类servlet容器也会给我们，但是我们不要
+				// # 排除接口和容器
 				if (!waiClass.isInterface() && !Modifier.isAbstract(waiClass.getModifiers()) &&
 						WebApplicationInitializer.class.isAssignableFrom(waiClass)) {
 					try {
-						// 实例化，然后添加到集合中
+						// # 实例化，然后添加到集合中
 						initializers.add((WebApplicationInitializer)
 								ReflectionUtils.accessibleConstructor(waiClass).newInstance());
 					}
@@ -171,7 +171,7 @@ public class SpringServletContainerInitializer implements ServletContainerInitia
 
 		servletContext.log(initializers.size() + " Spring WebApplicationInitializers detected on classpath");
 		AnnotationAwareOrderComparator.sort(initializers);
-		// 调用initializer.onStartup  进行扩展
+		// # 调用initializer.onStartup  进行扩展
 		for (WebApplicationInitializer initializer : initializers) {
 			initializer.onStartup(servletContext);
 		}

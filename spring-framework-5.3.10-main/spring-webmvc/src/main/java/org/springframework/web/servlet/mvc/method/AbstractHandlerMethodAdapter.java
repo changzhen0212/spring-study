@@ -97,6 +97,7 @@ public abstract class AbstractHandlerMethodAdapter extends WebContentGenerator i
 	 * or {@code null} if the request has been handled directly
 	 * @throws Exception in case of errors
 	 */
+	// ! 进入实现
 	@Nullable
 	protected abstract ModelAndView handleInternal(HttpServletRequest request,
 			HttpServletResponse response, HandlerMethod handlerMethod) throws Exception;

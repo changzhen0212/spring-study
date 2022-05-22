@@ -273,7 +273,7 @@ public class ContextLoader {
 		long startTime = System.currentTimeMillis();
 
 		try {
-			// xml会在这里创建
+			// # xml会在这里创建
 			if (this.context == null) {
 				this.context = createWebApplicationContext(servletContext);
 			}
@@ -288,10 +288,11 @@ public class ContextLoader {
 						ApplicationContext parent = loadParentContext(servletContext);
 						cwac.setParent(parent);
 					}
+					// ! 配置和刷新容器， 里面会调用refresh
 					configureAndRefreshWebApplicationContext(cwac, servletContext);
 				}
 			}
-			// 在servlet域中设置根容器（在子容器就可以直接拿到了）
+			// # 在servlet域中设置根容器（在子容器就可以直接拿到了）
 			servletContext.setAttribute(WebApplicationContext.ROOT_WEB_APPLICATION_CONTEXT_ATTRIBUTE, this.context);
 
 
@@ -378,7 +379,7 @@ public class ContextLoader {
 	protected void configureAndRefreshWebApplicationContext(ConfigurableWebApplicationContext wac, ServletContext sc) {
 		if (ObjectUtils.identityToString(wac).equals(wac.getId())) {
 
-			// 设置id
+			// # 设置id
 			String idParam = sc.getInitParameter(CONTEXT_ID_PARAM);
 			if (idParam != null) {
 				wac.setId(idParam);
@@ -389,9 +390,9 @@ public class ContextLoader {
 						ObjectUtils.getDisplayString(sc.getContextPath()));
 			}
 		}
-		// 设置ServletContext到spring上下文
+		// ! 设置ServletContext到spring上下文
 		wac.setServletContext(sc);
-		// 获得servlet容器中的全局参数contextConfigLocation  （xml）
+		// # 获得servlet容器中的全局参数contextConfigLocation  （xml的方式）
 		String configLocationParam = sc.getInitParameter(CONFIG_LOCATION_PARAM);
 		if (configLocationParam != null) {
 			wac.setConfigLocation(configLocationParam);
@@ -404,9 +405,9 @@ public class ContextLoader {
 		if (env instanceof ConfigurableWebEnvironment) {
 			((ConfigurableWebEnvironment) env).initPropertySources(sc, null);
 		}
-		// 在容器加载前 可以通过设置初始化参数contextInitializerClasses、globalInitializerClasses 进行扩展
+		// # 在容器加载前 可以通过设置初始化参数contextInitializerClasses、globalInitializerClasses 进行扩展
 		customizeContext(sc, wac);
-		// 刷新容器
+		// # 刷新容器
 		wac.refresh();
 	}
 
